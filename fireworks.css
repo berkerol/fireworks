@@ -1,0 +1,18 @@
+* {
+  margin: 0;
+}
+
+canvas {
+  background: #222;
+  display: block;
+}
+
+.change-color {
+  position: absolute;
+  right: 50%;
+}
+
+.change-random {
+  position: absolute;
+  left: 50%;
+}
