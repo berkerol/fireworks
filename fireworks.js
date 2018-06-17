@@ -11,14 +11,15 @@ let mouse = {
 };
 
 let firework = {
-  alpha: 0.01,
   color: 15,
   colors: [[240, 60, 80], [255, 100, 0], [255, 160, 0], [255, 220, 0], [220, 255, 0], [160, 255, 0], [50, 255, 0], [0, 220, 120], [130, 230, 220], [0, 220, 240], [240, 120, 255], [210, 140, 170], [220, 180, 240], [160, 220, 220], [200, 200, 200]],
   lineCap: 'round',
   shadowBlur: 10,
   lines: [20, 24, 30, 36, 40],
+  highestAlpha: 0.015,
   highestLineWidth: 2.5,
-  highestSpeed: 2,
+  highestSpeed: 1.5,
+  lowestAlpha: 0.005,
   lowestLineWidth: 1.5,
   lowestSpeed: 0.5,
   probability: 0.1
@@ -70,7 +71,7 @@ function removeFireworks () {
       fireworks.splice(i, 1);
     } else {
       f.length += f.speed;
-      f.alpha -= firework.alpha;
+      f.alpha -= f.dec;
     }
   }
 }
@@ -87,6 +88,7 @@ function createFirework (x, y) {
     y,
     color,
     alpha: 1,
+    dec: firework.lowestAlpha + Math.random() * (firework.highestAlpha - firework.lowestAlpha),
     length: 0,
     lines: firework.lines[Math.floor(Math.random() * firework.lines.length)],
     lineWidth: firework.lowestLineWidth + Math.random() * (firework.highestLineWidth - firework.lowestLineWidth),
