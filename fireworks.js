@@ -14,15 +14,13 @@ let firework = {
   alpha: 0.01,
   color: 15,
   colors: [[240, 60, 80], [255, 100, 0], [255, 160, 0], [255, 220, 0], [220, 255, 0], [160, 255, 0], [50, 255, 0], [0, 220, 120], [130, 230, 220], [0, 220, 240], [240, 120, 255], [210, 140, 170], [220, 180, 240], [160, 220, 220], [200, 200, 200]],
-  lines: 20,
   lineCap: 'round',
   shadowBlur: 10,
+  lines: [20, 24, 30, 36, 40],
   highestLineWidth: 2.5,
-  highestRadius: 150,
-  highestSpeed: 3,
+  highestSpeed: 2,
   lowestLineWidth: 1.5,
-  lowestRadius: 50,
-  lowestSpeed: 1,
+  lowestSpeed: 0.5,
   probability: 0.1
 };
 
@@ -50,10 +48,10 @@ function drawFirework (f) {
   ctx.lineWidth = f.lineWidth;
   ctx.shadowColor = color;
   ctx.strokeStyle = color;
-  for (let i = 0; i < firework.lines; i++) {
+  for (let i = 0; i < f.lines; i++) {
     ctx.beginPath();
     ctx.moveTo(f.x, f.y);
-    ctx.lineTo(f.x + f.length * Math.cos(i * 2 * Math.PI / firework.lines), f.y + f.length * Math.sin(i * 2 * Math.PI / firework.lines));
+    ctx.lineTo(f.x + f.length * Math.cos(i * 2 * Math.PI / f.lines), f.y + f.length * Math.sin(i * 2 * Math.PI / f.lines));
     ctx.stroke();
     ctx.closePath();
   }
@@ -68,7 +66,7 @@ function createFireworks () {
 function removeFireworks () {
   for (let i = fireworks.length - 1; i >= 0; i--) {
     let f = fireworks[i];
-    if (f.alpha < 0 || f.length >= f.radius) {
+    if (f.alpha < 0) {
       fireworks.splice(i, 1);
     } else {
       f.length += f.speed;
@@ -90,8 +88,8 @@ function createFirework (x, y) {
     color,
     alpha: 1,
     length: 0,
+    lines: firework.lines[Math.floor(Math.random() * firework.lines.length)],
     lineWidth: firework.lowestLineWidth + Math.random() * (firework.highestLineWidth - firework.lowestLineWidth),
-    radius: firework.lowestRadius + Math.random() * (firework.highestRadius - firework.lowestRadius),
     speed: firework.lowestSpeed + Math.random() * (firework.highestSpeed - firework.lowestSpeed)
   });
 }
