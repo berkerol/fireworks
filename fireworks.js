@@ -14,21 +14,19 @@ let firework = {
   color: 15,
   colors: [[240, 60, 80], [255, 100, 0], [255, 160, 0], [255, 220, 0], [220, 255, 0], [160, 255, 0], [50, 255, 0], [0, 220, 120], [130, 230, 220], [0, 220, 240], [240, 120, 255], [210, 140, 170], [220, 180, 240], [160, 220, 220], [200, 200, 200]],
   lineCap: 'round',
-  shadowBlur: 10,
   lines: [20, 24, 30, 36, 40],
   highestAlpha: 0.015,
   highestLineWidth: 2.5,
-  highestSpeed: 1.5,
+  highestSpeed: 1.0,
   lowestAlpha: 0.005,
   lowestLineWidth: 1.5,
   lowestSpeed: 0.5,
-  probability: 0.1
+  probability: 0.2
 };
 
 let fireworks = [];
 
 ctx.lineCap = firework.lineCap;
-ctx.shadowBlur = firework.shadowBlur;
 draw();
 document.addEventListener('mousedown', mouseDownHandler);
 document.addEventListener('mousemove', mouseMoveHandler);
@@ -45,14 +43,15 @@ function draw () {
 }
 
 function drawFirework (f) {
-  let color = 'rgba(' + f.color[0] + ',' + f.color[1] + ',' + f.color[2] + ',' + f.alpha + ')';
   ctx.lineWidth = f.lineWidth;
-  ctx.shadowColor = color;
-  ctx.strokeStyle = color;
-  for (let i = 0; i < f.lines; i++) {
+  ctx.strokeStyle = 'rgba(' + f.color[0] + ',' + f.color[1] + ',' + f.color[2] + ',' + f.alpha + ')';
+  for (let i = 0; i < f.lines / 2; i++) {
+    let angle = i * 2 * Math.PI / f.lines;
+    let x = f.length * Math.cos(angle);
+    let y = f.length * Math.sin(angle);
     ctx.beginPath();
-    ctx.moveTo(f.x, f.y);
-    ctx.lineTo(f.x + f.length * Math.cos(i * 2 * Math.PI / f.lines), f.y + f.length * Math.sin(i * 2 * Math.PI / f.lines));
+    ctx.moveTo(f.x - x, f.y - y);
+    ctx.lineTo(f.x + x, f.y + y);
     ctx.stroke();
     ctx.closePath();
   }
