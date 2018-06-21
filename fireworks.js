@@ -11,8 +11,6 @@ let mouse = {
 };
 
 let firework = {
-  color: 15,
-  colors: [[240, 60, 80], [255, 100, 0], [255, 160, 0], [255, 220, 0], [220, 255, 0], [160, 255, 0], [50, 255, 0], [0, 220, 120], [130, 230, 220], [0, 220, 240], [240, 120, 255], [210, 140, 170], [220, 180, 240], [160, 220, 220], [200, 200, 200]],
   lines: [20, 24, 30, 36, 40],
   lineCap: 'round',
   explosionAlpha: 0.4,
@@ -31,13 +29,26 @@ let firework = {
   lowestSpeed: 1.0,
   lowestSpeedDecrease: 0.01,
   lowestStep: 0.1,
-  lowestVariance: -0.04,
-  probability: 0.1
+  lowestVariance: -0.04
+};
+
+let rocket = {
+  color: 15,
+  colors: [[240, 60, 80], [255, 100, 0], [255, 160, 0], [255, 220, 0], [220, 255, 0], [160, 255, 0], [50, 255, 0], [0, 220, 120], [130, 230, 220], [0, 220, 240], [240, 120, 255], [210, 140, 170], [220, 180, 240], [160, 220, 220], [200, 200, 200]],
+  lineCap: 'round',
+  highestLength: 30,
+  highestLineWidth: 3,
+  highestSpeed: 10,
+  lowestLength: 20,
+  lowestLineWidth: 2,
+  lowestSpeed: 6,
+  probability: 0.05,
+  speed: 8
 };
 
 let fireworks = [];
+let rockets = [];
 
-ctx.lineCap = firework.lineCap;
 draw();
 document.addEventListener('mousedown', mouseDownHandler);
 document.addEventListener('mousemove', mouseMoveHandler);
@@ -45,11 +56,19 @@ window.addEventListener('resize', resizeHandler);
 
 function draw () {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.lineCap = firework.lineCap;
   for (let f of fireworks) {
     drawFirework(f);
   }
-  createFireworks();
+  ctx.lineCap = rocket.lineCap;
+  for (let r of rockets) {
+    drawRocket(r);
+  }
+  if (random && Math.random() < rocket.probability) {
+    createRocket(Math.random() * canvas.width, Math.random() * canvas.height);
+  }
   removeFireworks();
+  removeRockets();
   window.requestAnimationFrame(draw);
 }
 
@@ -85,10 +104,14 @@ function drawFirework (f) {
   }
 }
 
-function createFireworks () {
-  if (random && Math.random() < firework.probability) {
-    createFirework(Math.random() * canvas.width, Math.random() * canvas.height);
-  }
+function drawRocket (r) {
+  ctx.lineWidth = r.lineWidth;
+  ctx.strokeStyle = 'rgba(' + r.color[0] + ',' + r.color[1] + ',' + r.color[2] + ',' + 1.0 + ')';
+  ctx.beginPath();
+  ctx.moveTo(r.x, r.y);
+  ctx.lineTo(r.x + r.speedX / rocket.speed * r.length, r.y + r.speedY / rocket.speed * r.length);
+  ctx.stroke();
+  ctx.closePath();
 }
 
 function removeFireworks () {
@@ -114,13 +137,22 @@ function removeFireworks () {
   }
 }
 
-function createFirework (x, y) {
-  let color;
-  if (firework.color === firework.colors.length) {
-    color = firework.colors[Math.floor(Math.random() * firework.colors.length)];
-  } else {
-    color = firework.colors[firework.color];
+function removeRockets () {
+  for (let i = rockets.length - 1; i >= 0; i--) {
+    let r = rockets[i];
+    if (Math.abs(r.speedX) < 0.5 && Math.abs(r.speedY) < 0.5) {
+      rockets.splice(i, 1);
+      createFirework(r.x, r.y, r.color);
+    } else {
+      r.x += r.speedX;
+      r.y += r.speedY;
+      r.speedX -= r.speedDecreaseX;
+      r.speedY -= r.speedDecreaseY;
+    }
   }
+}
+
+function createFirework (x, y, color) {
   let lines = firework.lines[Math.floor(Math.random() * firework.lines.length)];
   let variances = [];
   for (let i = 0; i < lines / 2; i++) {
@@ -145,11 +177,37 @@ function createFirework (x, y) {
   });
 }
 
-function changeColor () {
-  if (firework.color === firework.colors.length) {
-    firework.color = 0;
+function createRocket (x, y) {
+  x -= canvas.width / 2;
+  y -= canvas.height;
+  let norm = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+  let speed = rocket.lowestSpeed + Math.random() * (rocket.highestSpeed - rocket.lowestSpeed);
+  let speedX = x / norm * speed;
+  let speedY = y / norm * speed;
+  let color;
+  if (rocket.color === rocket.colors.length) {
+    color = rocket.colors[Math.floor(Math.random() * rocket.colors.length)];
   } else {
-    firework.color++;
+    color = rocket.colors[rocket.color];
+  }
+  rockets.push({
+    x: canvas.width / 2,
+    y: canvas.height,
+    color,
+    length: rocket.lowestLength + Math.random() * (rocket.highestLength - rocket.lowestLength),
+    lineWidth: rocket.lowestLineWidth + Math.random() * (rocket.highestLineWidth - rocket.lowestLineWidth),
+    speedX,
+    speedY,
+    speedDecreaseX: speedX * speedX / (2 * x),
+    speedDecreaseY: speedY * speedY / (2 * y)
+  });
+}
+
+function changeColor () {
+  if (rocket.color === rocket.colors.length) {
+    rocket.color = 0;
+  } else {
+    rocket.color++;
   }
 }
 
@@ -163,7 +221,7 @@ function changeRandom () {
 }
 
 function mouseDownHandler (e) {
-  createFirework(mouse.x, mouse.y);
+  createRocket(mouse.x, mouse.y);
 }
 
 function mouseMoveHandler (e) {
