@@ -21,15 +21,13 @@ let firework = {
   highestSpeed: 2.0,
   highestSpeedDecrease: 0.02,
   highestStep: 0.3,
-  highestVariance: 0.04,
   lowestAlphaDecrease1: 0.005,
   lowestAlphaDecrease2: 0.01,
   lowestLineWidth: 1.5,
   lowestRadius: 1.5,
   lowestSpeed: 1.0,
   lowestSpeedDecrease: 0.01,
-  lowestStep: 0.1,
-  lowestVariance: -0.04
+  lowestStep: 0.1
 };
 
 let rocket = {
@@ -81,8 +79,8 @@ function drawFirework (f) {
       let x = f.length * Math.cos(angle);
       let y = f.length * Math.sin(angle);
       ctx.beginPath();
-      ctx.moveTo(f.x - x - x * f.variances[i], f.y - y - y * f.variances[i]);
-      ctx.lineTo(f.x + x + x * f.variances[i], f.y + y + y * f.variances[i]);
+      ctx.moveTo(f.x - x, f.y - y);
+      ctx.lineTo(f.x + x, f.y + y);
       ctx.stroke();
       ctx.closePath();
     }
@@ -95,8 +93,8 @@ function drawFirework (f) {
         let x = f.length * Math.cos(angle) * i;
         let y = f.length * Math.sin(angle) * i;
         ctx.beginPath();
-        ctx.arc(f.x - x - x * f.variances[j], f.y - y - y * f.variances[j], f.radius, 0, 2 * Math.PI);
-        ctx.arc(f.x + x + x * f.variances[j], f.y + y + y * f.variances[j], f.radius, 0, 2 * Math.PI);
+        ctx.arc(f.x - x, f.y - y, f.radius, 0, 2 * Math.PI);
+        ctx.arc(f.x + x, f.y + y, f.radius, 0, 2 * Math.PI);
         ctx.fill();
         ctx.closePath();
       }
@@ -153,11 +151,6 @@ function removeRockets () {
 }
 
 function createFirework (x, y, color) {
-  let lines = firework.lines[Math.floor(Math.random() * firework.lines.length)];
-  let variances = [];
-  for (let i = 0; i < lines / 2; i++) {
-    variances.push(firework.lowestVariance + Math.random() * (firework.highestVariance - firework.lowestVariance));
-  }
   fireworks.push({
     x,
     y,
@@ -167,13 +160,12 @@ function createFirework (x, y, color) {
     alphaDecrease1: firework.lowestAlphaDecrease1 + Math.random() * (firework.highestAlphaDecrease1 - firework.lowestAlphaDecrease1),
     alphaDecrease2: firework.lowestAlphaDecrease2 + Math.random() * (firework.highestAlphaDecrease2 - firework.lowestAlphaDecrease2),
     length: 0,
-    lines,
+    lines: firework.lines[Math.floor(Math.random() * firework.lines.length)],
     lineWidth: firework.lowestLineWidth + Math.random() * (firework.highestLineWidth - firework.lowestLineWidth),
     radius: firework.lowestRadius + Math.random() * (firework.highestRadius - firework.lowestRadius),
     speed: firework.lowestSpeed + Math.random() * (firework.highestSpeed - firework.lowestSpeed),
     speedDecrease: firework.lowestSpeedDecrease + Math.random() * (firework.highestSpeedDecrease - firework.lowestSpeedDecrease),
-    step: firework.lowestStep + Math.random() * (firework.highestStep - firework.lowestStep),
-    variances
+    step: firework.lowestStep + Math.random() * (firework.highestStep - firework.lowestStep)
   });
 }
 
