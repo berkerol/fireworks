@@ -172,7 +172,7 @@ function createFirework (x, y, color) {
 function createRocket (x, y) {
   x -= canvas.width / 2;
   y -= canvas.height;
-  let norm = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+  let norm = Math.sqrt(x ** 2 + y ** 2);
   let speed = rocket.lowestSpeed + Math.random() * (rocket.highestSpeed - rocket.lowestSpeed);
   let speedX = x / norm * speed;
   let speedY = y / norm * speed;
