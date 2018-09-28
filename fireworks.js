@@ -1,7 +1,13 @@
+/* global performance */
 let canvas = document.getElementById('canvas');
 let ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+
+const getTime = typeof performance === 'function' ? performance.now : Date.now;
+const FRAME_DURATION = 1000 / 58;
+let then = getTime();
+let acc = 0;
 
 let random = true;
 
@@ -53,6 +59,19 @@ document.addEventListener('mousemove', mouseMoveHandler);
 window.addEventListener('resize', resizeHandler);
 
 function draw () {
+  let now = getTime();
+  let ms = now - then;
+  let frames = 0;
+  then = now;
+  if (ms < 1000) {
+    acc += ms;
+    while (acc >= FRAME_DURATION) {
+      frames++;
+      acc -= FRAME_DURATION;
+    }
+  } else {
+    ms = 0;
+  }
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.lineCap = firework.lineCap;
   for (let f of fireworks) {
@@ -65,8 +84,8 @@ function draw () {
   if (random && Math.random() < rocket.probability) {
     createRocket(Math.random() * canvas.width, Math.random() * canvas.height);
   }
-  removeFireworks();
-  removeRockets();
+  removeFireworks(frames);
+  removeRockets(frames);
   window.requestAnimationFrame(draw);
 }
 
@@ -112,14 +131,14 @@ function drawRocket (r) {
   ctx.closePath();
 }
 
-function removeFireworks () {
+function removeFireworks (frames) {
   for (let i = fireworks.length - 1; i >= 0; i--) {
     let f = fireworks[i];
-    f.alpha1 -= f.alphaDecrease1;
+    f.alpha1 -= f.alphaDecrease1 * frames;
     if (f.alpha1 > firework.explosionAlpha) {
-      f.length += f.speed;
+      f.length += f.speed * frames;
       if (f.speed > firework.highestSpeedDecrease) {
-        f.speed -= f.speedDecrease;
+        f.speed -= f.speedDecrease * frames;
       } else {
         f.speed = 0;
       }
@@ -129,23 +148,23 @@ function removeFireworks () {
       } else if (f.alpha2 < 0) {
         fireworks.splice(i, 1);
       } else {
-        f.alpha2 -= f.alphaDecrease2;
+        f.alpha2 -= f.alphaDecrease2 * frames;
       }
     }
   }
 }
 
-function removeRockets () {
+function removeRockets (frames) {
   for (let i = rockets.length - 1; i >= 0; i--) {
     let r = rockets[i];
     if (Math.abs(r.speedX) < 0.5 && Math.abs(r.speedY) < 0.5) {
       rockets.splice(i, 1);
       createFirework(r.x, r.y, r.color);
     } else {
-      r.x += r.speedX;
-      r.y += r.speedY;
-      r.speedX -= r.speedDecreaseX;
-      r.speedY -= r.speedDecreaseY;
+      r.x += r.speedX * frames;
+      r.y += r.speedY * frames;
+      r.speedX -= r.speedDecreaseX * frames;
+      r.speedY -= r.speedDecreaseY * frames;
     }
   }
 }
