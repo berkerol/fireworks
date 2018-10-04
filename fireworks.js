@@ -27,35 +27,32 @@ let mouse = {
 };
 
 let firework = {
-  lineCap: 'round',
   explosionAlpha: 0.4,
+  lineCap: 'round',
+  lineWidth: 2,
   highestAlphaDecrease1: 0.015,
   highestAlphaDecrease2: 0.02,
   highestDegree: 15,
-  highestLineWidth: 2.5,
-  highestRadius: 2.5,
   highestSpeed: 2.0,
   highestSpeedDecrease: 0.02,
   highestStep: 0.3,
   lowestAlphaDecrease1: 0.005,
   lowestAlphaDecrease2: 0.01,
   lowestDegree: 12,
-  lowestLineWidth: 1.5,
-  lowestRadius: 1.5,
   lowestSpeed: 1.0,
   lowestSpeedDecrease: 0.01,
-  lowestStep: 0.1
+  lowestStep: 0.1,
+  radius: 2
 };
 
 let rocket = {
   color: 15,
   colors: [[240, 60, 80], [255, 100, 0], [255, 160, 0], [255, 220, 0], [220, 255, 0], [160, 255, 0], [50, 255, 0], [0, 220, 120], [130, 230, 220], [0, 220, 240], [240, 120, 255], [210, 140, 170], [220, 180, 240], [160, 220, 220], [200, 200, 200]],
   lineCap: 'round',
+  lineWidth: 3,
   highestLength: 30,
-  highestLineWidth: 3,
   highestSpeed: 10,
   lowestLength: 20,
-  lowestLineWidth: 2,
   lowestSpeed: 6,
   probability: 0.05,
   speed: 8
@@ -103,7 +100,7 @@ function draw () {
 
 function drawFirework (f) {
   if (f.alpha1 > 0) {
-    ctx.lineWidth = f.lineWidth;
+    ctx.lineWidth = firework.lineWidth;
     ctx.strokeStyle = 'rgba(' + f.color[0] + ',' + f.color[1] + ',' + f.color[2] + ',' + f.alpha1 + ')';
     for (let degree of f.degrees) {
       let angle = degree * Math.PI / 180;
@@ -124,8 +121,8 @@ function drawFirework (f) {
         let x = f.length * Math.cos(angle) * step;
         let y = f.length * Math.sin(angle) * step;
         ctx.beginPath();
-        ctx.arc(f.x - x, f.y - y, f.radius, 0, 2 * Math.PI);
-        ctx.arc(f.x + x, f.y + y, f.radius, 0, 2 * Math.PI);
+        ctx.arc(f.x - x, f.y - y, firework.radius, 0, 2 * Math.PI);
+        ctx.arc(f.x + x, f.y + y, firework.radius, 0, 2 * Math.PI);
         ctx.fill();
         ctx.closePath();
       }
@@ -134,7 +131,7 @@ function drawFirework (f) {
 }
 
 function drawRocket (r) {
-  ctx.lineWidth = r.lineWidth;
+  ctx.lineWidth = rocket.lineWidth;
   ctx.strokeStyle = 'rgba(' + r.color[0] + ',' + r.color[1] + ',' + r.color[2] + ',' + 1.0 + ')';
   ctx.beginPath();
   ctx.moveTo(r.x, r.y);
@@ -204,8 +201,6 @@ function createFirework (x, y, color) {
     alphaDecrease2: firework.lowestAlphaDecrease2 + Math.random() * (firework.highestAlphaDecrease2 - firework.lowestAlphaDecrease2),
     degrees,
     length: 0,
-    lineWidth: firework.lowestLineWidth + Math.random() * (firework.highestLineWidth - firework.lowestLineWidth),
-    radius: firework.lowestRadius + Math.random() * (firework.highestRadius - firework.lowestRadius),
     speed: firework.lowestSpeed + Math.random() * (firework.highestSpeed - firework.lowestSpeed),
     speedDecrease: firework.lowestSpeedDecrease + Math.random() * (firework.highestSpeedDecrease - firework.lowestSpeedDecrease),
     steps
@@ -230,7 +225,6 @@ function createRocket (x, y) {
     y: canvas.height,
     color,
     length: rocket.lowestLength + Math.random() * (rocket.highestLength - rocket.lowestLength),
-    lineWidth: rocket.lowestLineWidth + Math.random() * (rocket.highestLineWidth - rocket.lowestLineWidth),
     speedX,
     speedY,
     speedDecreaseX: speedX * speedX / (2 * x),
