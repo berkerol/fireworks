@@ -27,20 +27,20 @@ let mouse = {
 };
 
 let firework = {
-  explosionAlpha: 0.4,
+  explosionAlpha: 0.6,
   lineCap: 'round',
   lineWidth: 2,
-  highestAlphaDecrease1: 0.015,
-  highestAlphaDecrease2: 0.02,
-  highestDegree: 15,
-  highestSpeed: 2.0,
-  highestSpeedDecrease: 0.02,
+  highestAlphaDecrease1: 0.025,
+  highestAlphaDecrease2: 0.015,
+  highestDegree: 16,
+  highestSpeed: 1.6,
+  highestSpeedDecrease: 0.015,
   highestStep: 0.3,
-  lowestAlphaDecrease1: 0.005,
-  lowestAlphaDecrease2: 0.01,
+  lowestAlphaDecrease1: 0.015,
+  lowestAlphaDecrease2: 0.005,
   lowestDegree: 12,
-  lowestSpeed: 1.0,
-  lowestSpeedDecrease: 0.01,
+  lowestSpeed: 1.2,
+  lowestSpeedDecrease: 0.005,
   lowestStep: 0.1,
   radius: 2
 };
@@ -107,7 +107,7 @@ function drawFirework (f) {
       let x = f.length * Math.cos(angle);
       let y = f.length * Math.sin(angle);
       ctx.beginPath();
-      ctx.moveTo(f.x - x, f.y - y);
+      ctx.moveTo(f.x, f.y);
       ctx.lineTo(f.x + x, f.y + y);
       ctx.stroke();
       ctx.closePath();
@@ -121,7 +121,7 @@ function drawFirework (f) {
         let x = f.length * Math.cos(angle) * step;
         let y = f.length * Math.sin(angle) * step;
         ctx.beginPath();
-        ctx.arc(f.x - x, f.y - y, firework.radius, 0, 2 * Math.PI);
+        ctx.arc(f.x, f.y, firework.radius, 0, 2 * Math.PI);
         ctx.arc(f.x + x, f.y + y, firework.radius, 0, 2 * Math.PI);
         ctx.fill();
         ctx.closePath();
@@ -143,21 +143,24 @@ function drawRocket (r) {
 function removeFireworks (frames) {
   for (let i = fireworks.length - 1; i >= 0; i--) {
     let f = fireworks[i];
-    f.alpha1 -= f.alphaDecrease1 * frames;
-    if (f.alpha1 > firework.explosionAlpha) {
-      f.length += f.speed * frames;
-      if (f.speed > firework.highestSpeedDecrease) {
-        f.speed -= f.speedDecrease * frames;
-      } else {
-        f.speed = 0;
-      }
+    f.length += f.speed * frames;
+    if (f.speed > f.speedDecrease * frames) {
+      f.speed -= f.speedDecrease * frames;
     } else {
+      f.speed = 0;
+    }
+    if (f.alpha1 > f.alphaDecrease1 * frames) {
+      f.alpha1 -= f.alphaDecrease1 * frames;
+    } else {
+      f.alpha1 = 0;
+    }
+    if (f.alpha1 < firework.explosionAlpha) {
       if (f.alpha2 === -1) {
         f.alpha2 = 1;
-      } else if (f.alpha2 < 0) {
-        fireworks.splice(i, 1);
-      } else {
+      } else if (f.alpha2 > f.alphaDecrease2 * frames) {
         f.alpha2 -= f.alphaDecrease2 * frames;
+      } else {
+        fireworks.splice(i, 1);
       }
     }
   }
@@ -181,7 +184,7 @@ function removeRockets (frames) {
 function createFirework (x, y, color) {
   let degrees = [];
   let degree = 0;
-  while (degree < 180) {
+  while (degree < 360) {
     degrees.push(degree);
     degree += Math.floor(firework.lowestDegree + Math.random() * (firework.highestDegree - firework.lowestDegree));
   }
