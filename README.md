@@ -5,7 +5,7 @@
 [![ECMAScript](https://img.shields.io/badge/ECMAScript-latest-brightgreen.svg)](https://www.ecma-international.org/ecma-262)
 [![license](https://img.shields.io/badge/license-GNU%20GPL%20v3.0-blue.svg)](https://github.com/berkerol/fireworks/blob/master/LICENSE)
 
-Create your own fireworks show or watch one randomly. Click buttons to change colors of fireworks or toggle random fireworks. Mouse clicks create new fireworks in the location of mouse.
+Create your own fireworks show or watch one randomly. Click buttons to toggle random fireworks or change colors of fireworks. Mouse clicks create new fireworks in the location of mouse.
 
 [![button](watch.png)](https://berkerol.github.io/fireworks/fireworks.html)
 

@@ -7,12 +7,39 @@
   <title>Fireworks</title>
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" rel="stylesheet" />
   <link href="fireworks.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </head>
 
 <body>
   <div class="btn-group buttons">
-    <a class="btn btn-lg btn-info" onclick="changeColor()" accesskey="c"><span class="glyphicon glyphicon-transfer"></span> <span style="text-decoration: underline">C</span>hange color</a>
-    <a class="btn btn-lg btn-info" onclick="changeRandom()" accesskey="r"><span class="glyphicon glyphicon-refresh"></span> <span style="text-decoration: underline">R</span>andom mode: <span id="change-random">On</span></a>
+    <a class="btn btn-lg btn-info" onclick="changeRandom()" accesskey="r"><span class="glyphicon glyphicon-random"></span> <span style="text-decoration: underline">R</span>andom mode: <span id="change-random">On</span></a>
+    <div class="btn-group">
+      <a class="btn btn-lg btn-info dropdown-toggle" type="button" data-toggle="dropdown" accesskey="c"><span class="glyphicon glyphicon-refresh"></span> <span id="selected"><span style="text-decoration: underline">C</span>hange color</span> <span class="caret"></span></a>
+      <ul class="dropdown-menu">
+        <li data-value="0"><a href="#">Red</a></li>
+        <li data-value="1"><a href="#">Orange</a></li>
+        <li data-value="2"><a href="#">Yellow</a></li>
+        <li role="separator" class="divider"></li>
+        <li data-value="3"><a href="#">Lime</a></li>
+        <li data-value="4"><a href="#">Green</a></li>
+        <li data-value="5"><a href="#">Teal</a></li>
+        <li role="separator" class="divider"></li>
+        <li data-value="6"><a href="#">Aqua</a></li>
+        <li data-value="7"><a href="#">Blue</a></li>
+        <li role="separator" class="divider"></li>
+        <li data-value="8"><a href="#">Purple</a></li>
+        <li data-value="9"><a href="#">Pink</a></li>
+        <li data-value="10"><a href="#">Fuchsia</a></li>
+        <li role="separator" class="divider"></li>
+        <li data-value="11"><a href="#">Dark Gray</a></li>
+        <li data-value="12"><a href="#">Light Gray</a></li>
+        <li data-value="13"><a href="#">Silver</a></li>
+        <li role="separator" class="divider"></li>
+        <li data-value="14"><a href="#">Random (same colors)</a></li>
+        <li data-value="15"><a href="#">Random (different colors)</a></li>
+      </ul>
+    </div>
   </div>
   <canvas id="canvas">Your browser doesn't support HTML5.</canvas>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fpsmeter/0.3.1/fpsmeter.min.js"></script>
