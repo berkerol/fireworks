@@ -21,11 +21,6 @@ let meter = new FPSMeter({
 
 let random = true;
 
-let mouse = {
-  x: canvas.width / 2,
-  y: canvas.height / 2
-};
-
 let firework = {
   explosionAlpha: 0.6,
   lineCap: 'round',
@@ -63,7 +58,6 @@ let rockets = [];
 
 draw();
 document.addEventListener('mousedown', mouseDownHandler);
-document.addEventListener('mousemove', mouseMoveHandler);
 window.addEventListener('resize', resizeHandler);
 
 function draw () {
@@ -253,12 +247,7 @@ $('.dropdown-menu li a').click(function () {
 });
 
 function mouseDownHandler (e) {
-  createRocket(mouse.x, mouse.y);
-}
-
-function mouseMoveHandler (e) {
-  mouse.x = e.clientX - canvas.offsetLeft;
-  mouse.y = e.clientY - canvas.offsetTop;
+  createRocket(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
 }
 
 function resizeHandler () {
