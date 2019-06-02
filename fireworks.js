@@ -95,7 +95,7 @@ function draw () {
 function drawFirework (f) {
   if (f.alpha1 > 0) {
     ctx.lineWidth = firework.lineWidth;
-    ctx.strokeStyle = 'rgba(' + f.color[0] + ',' + f.color[1] + ',' + f.color[2] + ',' + f.alpha1 + ')';
+    ctx.strokeStyle = `rgba(${f.color[0]}, ${f.color[1]}, ${f.color[2]}, ${f.alpha1})`;
     for (const degree of f.degrees) {
       const angle = degree * Math.PI / 180;
       const x = f.length * Math.cos(angle);
@@ -108,7 +108,7 @@ function drawFirework (f) {
     }
   }
   if (f.alpha2 > 0) {
-    ctx.fillStyle = 'rgba(' + f.color[0] + ',' + f.color[1] + ',' + f.color[2] + ',' + f.alpha2 + ')';
+    ctx.fillStyle = `rgba(${f.color[0]}, ${f.color[1]}, ${f.color[2]}, ${f.alpha2})`;
     for (const step of f.steps) {
       for (const degree of f.degrees) {
         const angle = degree * Math.PI / 180;
@@ -126,7 +126,7 @@ function drawFirework (f) {
 
 function drawRocket (r) {
   ctx.lineWidth = rocket.lineWidth;
-  ctx.strokeStyle = 'rgba(' + r.color[0] + ',' + r.color[1] + ',' + r.color[2] + ',' + 1.0 + ')';
+  ctx.strokeStyle = `rgba(${r.color[0]}, ${r.color[1]}, ${r.color[2]}, 1.0)`;
   ctx.beginPath();
   ctx.moveTo(r.x, r.y);
   ctx.lineTo(r.x + r.speedX / rocket.speed * r.length, r.y + r.speedY / rocket.speed * r.length);
