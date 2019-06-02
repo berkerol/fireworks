@@ -1,4 +1,4 @@
-/* global performance FPSMeter */
+/* global $ performance FPSMeter */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
@@ -228,14 +228,14 @@ function createRocket (x, y) {
   });
 }
 
-function changeRandom () {
+window.changeRandom = function () {
   random = !random;
   if (random) {
     document.getElementById('change-random').innerHTML = 'On';
   } else {
     document.getElementById('change-random').innerHTML = 'Off';
   }
-}
+};
 
 $('.dropdown-menu li a').click(function () {
   $('#selected').text($(this).text());
