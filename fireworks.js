@@ -224,8 +224,8 @@ function createRocket (x, y) {
     length: rocket.lowestLength + Math.random() * (rocket.highestLength - rocket.lowestLength),
     speedX,
     speedY,
-    speedDecreaseX: speedX * speedX / (2 * x),
-    speedDecreaseY: speedY * speedY / (2 * y)
+    speedDecreaseX: speedX ** 2 / (2 * x),
+    speedDecreaseY: speedY ** 2 / (2 * y)
   });
 }
 
