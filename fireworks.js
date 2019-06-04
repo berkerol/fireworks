@@ -40,8 +40,8 @@ const firework = {
 };
 
 const rocket = {
-  color: 15,
-  colors: [[255, 30, 40], [255, 150, 20], [255, 220, 0], [0, 255, 100], [100, 255, 20], [50, 200, 200], [120, 220, 255], [80, 180, 255], [220, 120, 255], [255, 100, 150], [240, 20, 200], [140, 140, 140], [170, 170, 170], [200, 200, 200], [0, 0, 0]],
+  color: 16,
+  colors: [[255, 30, 40], [255, 150, 20], [255, 220, 0], [0, 255, 100], [100, 255, 20], [50, 200, 200], [120, 220, 255], [80, 180, 255], [220, 120, 255], [255, 100, 150], [240, 20, 200], [140, 140, 140], [170, 170, 170], [200, 200, 200], [255, 0, 0], [0, 0, 0]],
   lineCap: 'round',
   lineWidth: 3,
   highestLength: 30,
@@ -56,6 +56,9 @@ const fireworks = [];
 const rockets = [];
 
 draw();
+document.getElementById('customColor').addEventListener('change', function () {
+  rocket.colors[rocket.colors.length - 2] = this.value.match(/[A-Za-z0-9]{2}/g).map(v => parseInt(v, 16));
+});
 document.addEventListener('mousedown', mouseDownHandler);
 window.addEventListener('resize', resizeHandler);
 
@@ -212,7 +215,7 @@ function createRocket (x, y) {
   const speedY = y / norm * speed;
   let color;
   if (rocket.color === rocket.colors.length) {
-    color = rocket.colors[Math.floor(Math.random() * (rocket.colors.length - 1))];
+    color = rocket.colors[Math.floor(Math.random() * (rocket.colors.length - 2))];
   } else {
     color = rocket.colors[rocket.color];
   }
@@ -241,7 +244,7 @@ $('.dropdown-menu li a').click(function () {
   $('#selected').text($(this).text());
   rocket.color = $(this).closest('li').data('value');
   if (rocket.color === rocket.colors.length - 1) {
-    rocket.colors[rocket.colors.length - 1] = rocket.colors[Math.floor(Math.random() * rocket.colors.length)];
+    rocket.colors[rocket.colors.length - 1] = rocket.colors[Math.floor(Math.random() * (rocket.colors.length - 2))];
   }
 });
 
