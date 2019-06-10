@@ -240,9 +240,9 @@ window.changeRandom = function () {
   }
 };
 
-$('.dropdown-menu li a').click(function () {
+$('.dropdown-item').click(function () {
   $('#selected').text($(this).text());
-  rocket.color = $(this).closest('li').data('value');
+  rocket.color = $(this).closest('.dropdown-item').data('value');
   if (rocket.color === rocket.colors.length - 1) {
     rocket.colors[rocket.colors.length - 1] = rocket.colors[Math.floor(Math.random() * (rocket.colors.length - 2))];
   }

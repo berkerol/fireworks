@@ -6,44 +6,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <title>Fireworks</title>
   <meta name="description" content="Create your own fireworks show or watch one randomly">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link rel="stylesheet" href="fireworks.css">
 </head>
 
 <body>
-  <div class="btn-group buttons">
-    <a class="btn btn-lg btn-info" onclick="changeRandom()" accesskey="r"><span class="glyphicon glyphicon-random"></span> <span style="text-decoration: underline">R</span>andom mode: <span id="change-random">On</span></a>
-    <div class="btn-group">
-      <a class="btn btn-lg btn-info dropdown-toggle" type="button" data-toggle="dropdown" accesskey="c"><span class="glyphicon glyphicon-refresh"></span> <span id="selected"><span style="text-decoration: underline">C</span>hange color</span> <span class="caret"></span></a>
-      <ul class="dropdown-menu">
-        <li data-value="0"><a href="#">Red</a></li>
-        <li data-value="1"><a href="#">Orange</a></li>
-        <li data-value="2"><a href="#">Yellow</a></li>
-        <li role="separator" class="divider"></li>
-        <li data-value="3"><a href="#">Lime</a></li>
-        <li data-value="4"><a href="#">Green</a></li>
-        <li data-value="5"><a href="#">Teal</a></li>
-        <li role="separator" class="divider"></li>
-        <li data-value="6"><a href="#">Aqua</a></li>
-        <li data-value="7"><a href="#">Blue</a></li>
-        <li role="separator" class="divider"></li>
-        <li data-value="8"><a href="#">Purple</a></li>
-        <li data-value="9"><a href="#">Pink</a></li>
-        <li data-value="10"><a href="#">Fuchsia</a></li>
-        <li role="separator" class="divider"></li>
-        <li data-value="11"><a href="#">Dark Gray</a></li>
-        <li data-value="12"><a href="#">Light Gray</a></li>
-        <li data-value="13"><a href="#">Silver</a></li>
-        <li role="separator" class="divider"></li>
-        <li data-value="14"><a href="#">Custom color <input type="color" value="#ff0000" id="customColor"></a></li>
-        <li data-value="15"><a href="#">Random (same colors)</a></li>
-        <li data-value="16"><a href="#">Random (different colors)</a></li>
-      </ul>
+  <div class="btn-group btn-group-lg btn-group-center">
+    <button type="button" class="btn btn-info" onclick="changeRandom()" accesskey="r"><i class="fas fa-random"></i> <span style="text-decoration: underline">R</span>andom mode: <span id="change-random">On</span></button>
+    <div class="btn-group btn-group-lg">
+      <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" accesskey="c"><i class="fas fa-sync"></i> <span id="selected"><span style="text-decoration: underline">C</span>hange color</span></button>
+      <div class="dropdown-menu">
+        <button type="button" class="dropdown-item" data-value="0">Red</button>
+        <button type="button" class="dropdown-item" data-value="1">Orange</button>
+        <button type="button" class="dropdown-item" data-value="2">Yellow</button>
+        <div class="dropdown-divider"></div>
+        <button type="button" class="dropdown-item" data-value="3">Lime</button>
+        <button type="button" class="dropdown-item" data-value="4">Green</button>
+        <button type="button" class="dropdown-item" data-value="5">Teal</button>
+        <div class="dropdown-divider"></div>
+        <button type="button" class="dropdown-item" data-value="6">Aqua</button>
+        <button type="button" class="dropdown-item" data-value="7">Blue</button>
+        <div class="dropdown-divider"></div>
+        <button type="button" class="dropdown-item" data-value="8">Purple</button>
+        <button type="button" class="dropdown-item" data-value="9">Pink</button>
+        <button type="button" class="dropdown-item" data-value="10">Fuchsia</button>
+        <div class="dropdown-divider"></div>
+        <button type="button" class="dropdown-item" data-value="11">Dark Gray</button>
+        <button type="button" class="dropdown-item" data-value="12">Light Gray</button>
+        <button type="button" class="dropdown-item" data-value="13">Silver</button>
+        <div class="dropdown-divider"></div>
+        <button type="button" class="dropdown-item" data-value="14">Custom color <input type="color" value="#ff0000" id="customColor" /></button>
+        <button type="button" class="dropdown-item" data-value="15">Random (same colors)</button>
+        <button type="button" class="dropdown-item" data-value="16">Random (different colors)</button>
+      </div>
     </div>
   </div>
   <canvas id="canvas">Your browser doesn't support HTML5.</canvas>
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https://kit.fontawesome.com/a1c4b21e48.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fpsmeter/0.3.1/fpsmeter.min.js"></script>
   <script src="fireworks.js"></script>
   <script>
