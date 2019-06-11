@@ -1,4 +1,4 @@
-/* global $ performance FPSMeter */
+/* global performance FPSMeter */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
@@ -56,6 +56,15 @@ const fireworks = [];
 const rockets = [];
 
 draw();
+document.querySelectorAll('.dropdown-item').forEach(e => {
+  e.addEventListener('click', function () {
+    document.getElementById('selected').innerText = this.innerText;
+    rocket.color = +this.dataset.value;
+    if (rocket.color === rocket.colors.length - 1) {
+      rocket.colors[rocket.colors.length - 1] = rocket.colors[Math.floor(Math.random() * (rocket.colors.length - 2))];
+    }
+  });
+});
 document.getElementById('customColor').addEventListener('change', function () {
   rocket.colors[rocket.colors.length - 2] = this.value.match(/[A-Za-z0-9]{2}/g).map(v => parseInt(v, 16));
 });
@@ -239,14 +248,6 @@ window.changeRandom = function () {
     document.getElementById('change-random').innerHTML = 'Off';
   }
 };
-
-$('.dropdown-item').click(function () {
-  $('#selected').text($(this).text());
-  rocket.color = $(this).closest('.dropdown-item').data('value');
-  if (rocket.color === rocket.colors.length - 1) {
-    rocket.colors[rocket.colors.length - 1] = rocket.colors[Math.floor(Math.random() * (rocket.colors.length - 2))];
-  }
-});
 
 function mouseDownHandler (e) {
   createRocket(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
