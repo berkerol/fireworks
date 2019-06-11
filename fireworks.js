@@ -58,7 +58,7 @@ const rockets = [];
 draw();
 document.querySelectorAll('.dropdown-item').forEach(e => {
   e.addEventListener('click', function () {
-    document.getElementById('selected').innerText = this.innerText;
+    document.getElementById('change-color-text').innerText = this.innerText;
     rocket.color = +this.dataset.value;
     if (rocket.color === rocket.colors.length - 1) {
       rocket.colors[rocket.colors.length - 1] = rocket.colors[Math.floor(Math.random() * (rocket.colors.length - 2))];
