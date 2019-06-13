@@ -44,6 +44,7 @@ const rocket = {
   colors: [[255, 30, 40], [255, 150, 20], [255, 220, 0], [0, 255, 100], [100, 255, 20], [50, 200, 200], [120, 220, 255], [80, 180, 255], [220, 120, 255], [255, 100, 150], [240, 20, 200], [140, 140, 140], [170, 170, 170], [200, 200, 200], [255, 0, 0], [0, 0, 0]],
   lineCap: 'round',
   lineWidth: 3,
+  shadowBlur: 20,
   highestLength: 30,
   highestSpeed: 10,
   lowestLength: 20,
@@ -87,11 +88,14 @@ function draw () {
   }
   meter.tick();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.shadowBlur = rocket.shadowBlur;
   ctx.lineCap = firework.lineCap;
+  ctx.lineWidth = firework.lineWidth;
   for (const f of fireworks) {
     drawFirework(f);
   }
   ctx.lineCap = rocket.lineCap;
+  ctx.lineWidth = rocket.lineWidth;
   for (const r of rockets) {
     drawRocket(r);
   }
@@ -105,44 +109,44 @@ function draw () {
 
 function drawFirework (f) {
   if (f.alpha1 > 0) {
-    ctx.lineWidth = firework.lineWidth;
-    ctx.strokeStyle = `rgba(${f.color[0]}, ${f.color[1]}, ${f.color[2]}, ${f.alpha1})`;
+    const color1 = `rgba(${f.color[0]}, ${f.color[1]}, ${f.color[2]}, ${f.alpha1})`;
+    ctx.shadowColor = color1;
+    ctx.strokeStyle = color1;
+    ctx.beginPath();
     for (const degree of f.degrees) {
       const angle = degree * Math.PI / 180;
       const x = f.length * Math.cos(angle);
       const y = f.length * Math.sin(angle);
-      ctx.beginPath();
       ctx.moveTo(f.x, f.y);
       ctx.lineTo(f.x + x, f.y + y);
-      ctx.stroke();
-      ctx.closePath();
     }
+    ctx.stroke();
   }
   if (f.alpha2 > 0) {
-    ctx.fillStyle = `rgba(${f.color[0]}, ${f.color[1]}, ${f.color[2]}, ${f.alpha2})`;
+    const color2 = `rgba(${f.color[0]}, ${f.color[1]}, ${f.color[2]}, ${f.alpha2})`;
+    ctx.shadowColor = color2;
+    ctx.fillStyle = color2;
+    ctx.beginPath();
     for (const step of f.steps) {
       for (const degree of f.degrees) {
         const angle = degree * Math.PI / 180;
         const x = f.length * Math.cos(angle) * step;
         const y = f.length * Math.sin(angle) * step;
-        ctx.beginPath();
         ctx.arc(f.x, f.y, firework.radius, 0, 2 * Math.PI);
         ctx.arc(f.x + x, f.y + y, firework.radius, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.closePath();
       }
     }
+    ctx.fill();
   }
 }
 
 function drawRocket (r) {
-  ctx.lineWidth = rocket.lineWidth;
-  ctx.strokeStyle = `rgba(${r.color[0]}, ${r.color[1]}, ${r.color[2]}, 1.0)`;
+  ctx.shadowColor = r.color;
+  ctx.strokeStyle = r.color;
   ctx.beginPath();
   ctx.moveTo(r.x, r.y);
   ctx.lineTo(r.x + r.speedX / rocket.speed * r.length, r.y + r.speedY / rocket.speed * r.length);
   ctx.stroke();
-  ctx.closePath();
 }
 
 function removeFireworks (frames) {
@@ -176,7 +180,7 @@ function removeRockets (frames) {
     const r = rockets[i];
     if (Math.abs(r.speedX) < 0.5 && Math.abs(r.speedY) < 0.5) {
       rockets.splice(i, 1);
-      createFirework(r.x, r.y, r.color);
+      createFirework(r.x, r.y, r.colorFirework);
     } else {
       r.x += r.speedX * frames;
       r.y += r.speedY * frames;
@@ -231,7 +235,8 @@ function createRocket (x, y) {
   rockets.push({
     x: canvas.width / 2,
     y: canvas.height,
-    color,
+    color: `rgb(${color[0]}, ${color[1]}, ${color[2]})`,
+    colorFirework: color,
     length: rocket.lowestLength + Math.random() * (rocket.highestLength - rocket.lowestLength),
     speedX,
     speedY,
