@@ -8,6 +8,7 @@ const getTime = typeof performance === 'function' ? performance.now : Date.now;
 const FRAME_DURATION = 1000 / 58;
 let then = getTime();
 let acc = 0;
+let animation;
 FPSMeter.theme.colorful.container.height = '40px';
 const meter = new FPSMeter({
   left: canvas.width - 130 + 'px',
@@ -69,6 +70,7 @@ document.querySelectorAll('.dropdown-item').forEach(e => {
 document.getElementById('customColor').addEventListener('change', function () {
   rocket.colors[rocket.colors.length - 2] = this.value.match(/[A-Za-z0-9]{2}/g).map(v => parseInt(v, 16));
 });
+document.addEventListener('keyup', keyUpHandler);
 document.addEventListener('mousedown', mouseDownHandler);
 window.addEventListener('resize', resizeHandler);
 
@@ -104,7 +106,7 @@ function draw () {
   }
   removeFireworks(frames);
   removeRockets(frames);
-  window.requestAnimationFrame(draw);
+  animation = window.requestAnimationFrame(draw);
 }
 
 function drawFirework (f) {
@@ -254,8 +256,21 @@ window.changeRandom = function () {
   }
 };
 
+function keyUpHandler (e) {
+  if (e.keyCode === 80) {
+    if (animation === undefined) {
+      animation = window.requestAnimationFrame(draw);
+    } else {
+      window.cancelAnimationFrame(animation);
+      animation = undefined;
+    }
+  }
+}
+
 function mouseDownHandler (e) {
-  createRocket(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+  if (animation !== undefined) {
+    createRocket(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+  }
 }
 
 function resizeHandler () {
