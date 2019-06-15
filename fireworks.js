@@ -198,8 +198,8 @@ function createFirework (x, y, color) {
     degree += Math.floor(firework.lowestDegree + Math.random() * (firework.highestDegree - firework.lowestDegree));
   }
   const steps = [];
-  let step = 1.0;
-  while (step > 0.0) {
+  let step = 1;
+  while (step > 0) {
     steps.push(step);
     step -= firework.lowestStep + Math.random() * (firework.highestStep - firework.lowestStep);
   }
