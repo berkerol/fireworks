@@ -59,6 +59,22 @@ const fireworks = [];
 const rockets = [];
 
 draw();
+const dropdown = document.getElementById('change-color');
+const custom = document.getElementById('custom');
+const colors = ['Red', 'Orange', 'Yellow', 'Lime', 'Green', 'Teal', 'Aqua', 'Blue', 'Purple', 'Pink', 'Fuchsia', 'Dark Gray', 'Light Gray', 'Silver'];
+for (const i in colors) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'dropdown-item';
+  button.setAttribute('data-value', i);
+  button.innerHTML = colors[i];
+  dropdown.insertBefore(button, custom);
+  if (i === '2' || i === '5' || i === '7' || i === '10' || i === '13') {
+    const div = document.createElement('div');
+    div.className = 'dropdown-divider';
+    dropdown.insertBefore(div, custom);
+  }
+}
 document.querySelectorAll('.dropdown-item').forEach(e => {
   e.addEventListener('click', function () {
     document.getElementById('change-color-text').innerText = this.innerText;
