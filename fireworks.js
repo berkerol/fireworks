@@ -23,36 +23,32 @@ const meter = new FPSMeter({
 let random = true;
 
 const firework = {
-  explosionAlpha: 0.6,
-  lineCap: 'round',
-  lineWidth: 2,
-  highestAlphaDecrease1: 0.025,
-  highestAlphaDecrease2: 0.015,
-  highestDegree: 16,
-  highestSpeed: 1.6,
-  highestSpeedDecrease: 0.015,
-  highestStep: 0.3,
-  lowestAlphaDecrease1: 0.015,
-  lowestAlphaDecrease2: 0.005,
-  lowestDegree: 12,
-  lowestSpeed: 1.2,
-  lowestSpeedDecrease: 0.005,
-  lowestStep: 0.1,
-  radius: 2
+  lineWidth: 3,
+  highestAlphaDecrease: 0.02,
+  highestLength: 20,
+  highestRadius: 100,
+  highestSpeed: 3,
+  lowestAlphaDecrease: 0.01,
+  lowestLength: 10,
+  lowestRadius: 50,
+  lowestSpeed: 2,
+  speed: 2.5,
+  speedThreshold: 0.1
 };
 
 const rocket = {
   color: 16,
   colors: [[255, 30, 40], [255, 150, 20], [255, 220, 0], [0, 255, 100], [100, 255, 20], [50, 200, 200], [120, 220, 255], [80, 180, 255], [220, 120, 255], [255, 100, 150], [240, 20, 200], [140, 140, 140], [170, 170, 170], [200, 200, 200], [255, 0, 0], [0, 0, 0]],
   lineCap: 'round',
-  lineWidth: 3,
+  lineWidth: 4,
   shadowBlur: 20,
   highestLength: 30,
   highestSpeed: 10,
   lowestLength: 20,
   lowestSpeed: 6,
   probability: 0.05,
-  speed: 8
+  speed: 8,
+  speedThreshold: 0.5
 };
 
 const fireworks = [];
@@ -107,17 +103,23 @@ function draw () {
   }
   meter.tick();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.shadowBlur = rocket.shadowBlur;
-  ctx.lineCap = firework.lineCap;
+  ctx.lineCap = rocket.lineCap;
   ctx.lineWidth = firework.lineWidth;
   for (const f of fireworks) {
-    drawFirework(f);
+    for (const m of f.moving) {
+      drawFirework(m, f.color);
+    }
+    for (const s of f.fading) {
+      drawFirework(s, f.color);
+    }
   }
-  ctx.lineCap = rocket.lineCap;
   ctx.lineWidth = rocket.lineWidth;
+  ctx.save();
+  ctx.shadowBlur = rocket.shadowBlur;
   for (const r of rockets) {
     drawRocket(r);
   }
+  ctx.restore();
   if (random && Math.random() < rocket.probability) {
     createRocket(Math.random() * canvas.width, Math.random() * canvas.height);
   }
@@ -126,37 +128,13 @@ function draw () {
   animation = window.requestAnimationFrame(draw);
 }
 
-function drawFirework (f) {
-  if (f.alpha1 > 0) {
-    const color1 = `rgba(${f.color[0]}, ${f.color[1]}, ${f.color[2]}, ${f.alpha1})`;
-    ctx.shadowColor = color1;
-    ctx.strokeStyle = color1;
-    ctx.beginPath();
-    for (const degree of f.degrees) {
-      const angle = degree * Math.PI / 180;
-      const x = f.length * Math.cos(angle);
-      const y = f.length * Math.sin(angle);
-      ctx.moveTo(f.x, f.y);
-      ctx.lineTo(f.x + x, f.y + y);
-    }
-    ctx.stroke();
-  }
-  if (f.alpha2 > 0) {
-    const color2 = `rgba(${f.color[0]}, ${f.color[1]}, ${f.color[2]}, ${f.alpha2})`;
-    ctx.shadowColor = color2;
-    ctx.fillStyle = color2;
-    ctx.beginPath();
-    for (const step of f.steps) {
-      for (const degree of f.degrees) {
-        const angle = degree * Math.PI / 180;
-        const x = f.length * Math.cos(angle) * step;
-        const y = f.length * Math.sin(angle) * step;
-        ctx.arc(f.x, f.y, firework.radius, 0, 2 * Math.PI);
-        ctx.arc(f.x + x, f.y + y, firework.radius, 0, 2 * Math.PI);
-      }
-    }
-    ctx.fill();
-  }
+function drawFirework (f, c) {
+  const color = `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${f.alpha})`;
+  ctx.strokeStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(f.x, f.y);
+  ctx.lineTo(f.x + f.speedX / firework.speed * f.length, f.y + f.speedY / firework.speed * f.length);
+  ctx.stroke();
 }
 
 function drawRocket (r) {
@@ -170,24 +148,36 @@ function drawRocket (r) {
 
 function removeFireworks (frames) {
   for (let i = fireworks.length - 1; i >= 0; i--) {
-    const f = fireworks[i];
-    f.length += f.speed * frames;
-    if (f.speed > f.speedDecrease * frames) {
-      f.speed -= f.speedDecrease * frames;
-    } else {
-      f.speed = 0;
-    }
-    if (f.alpha1 > f.alphaDecrease1 * frames) {
-      f.alpha1 -= f.alphaDecrease1 * frames;
-    } else {
-      f.alpha1 = 0;
-    }
-    if (f.alpha1 < firework.explosionAlpha) {
-      if (f.alpha2 === -1) {
-        f.alpha2 = 1;
-      } else if (f.alpha2 > f.alphaDecrease2 * frames) {
-        f.alpha2 -= f.alphaDecrease2 * frames;
+    for (let j = fireworks[i].moving.length - 1; j >= 0; j--) {
+      const f = fireworks[i].moving[j];
+      if (Math.abs(f.speedX) < firework.speedThreshold && Math.abs(f.speedY) < firework.speedThreshold) {
+        fireworks[i].moving.splice(j, 1);
+        fireworks[i].fading.push(f);
       } else {
+        f.x += f.speedX * frames;
+        f.y += f.speedY * frames;
+        if (Math.sign(f.speedX) === Math.sign(f.speedX - f.speedDecreaseX * frames)) {
+          f.speedX -= f.speedDecreaseX * frames;
+        } else {
+          f.speedX = 0;
+        }
+        if (Math.sign(f.speedY) === Math.sign(f.speedY - f.speedDecreaseY * frames)) {
+          f.speedY -= f.speedDecreaseY * frames;
+        } else {
+          f.speedY = 0;
+        }
+      }
+    }
+    if (fireworks[i].moving.length === 0) {
+      for (let j = fireworks[i].fading.length - 1; j >= 0; j--) {
+        const f = fireworks[i].fading[j];
+        if (f.alpha > f.alphaDecrease * frames) {
+          f.alpha -= f.alphaDecrease * frames;
+        } else {
+          fireworks[i].fading.splice(j, 1);
+        }
+      }
+      if (fireworks[i].fading.length === 0) {
         fireworks.splice(i, 1);
       }
     }
@@ -197,7 +187,7 @@ function removeFireworks (frames) {
 function removeRockets (frames) {
   for (let i = rockets.length - 1; i >= 0; i--) {
     const r = rockets[i];
-    if (Math.abs(r.speedX) < 0.5 && Math.abs(r.speedY) < 0.5) {
+    if (Math.abs(r.speedX) < rocket.speedThreshold && Math.abs(r.speedY) < rocket.speedThreshold) {
       rockets.splice(i, 1);
       createFirework(r.x, r.y, r.colorFirework);
     } else {
@@ -210,41 +200,43 @@ function removeRockets (frames) {
 }
 
 function createFirework (x, y, color) {
-  const degrees = [];
-  let degree = 0;
-  while (degree < 360) {
-    degrees.push(degree);
-    degree += Math.floor(firework.lowestDegree + Math.random() * (firework.highestDegree - firework.lowestDegree));
-  }
-  const steps = [];
-  let step = 1;
-  while (step > 0) {
-    steps.push(step);
-    step -= firework.lowestStep + Math.random() * (firework.highestStep - firework.lowestStep);
+  const moving = [];
+  const R = firework.lowestRadius + Math.random() * (firework.highestRadius - firework.lowestRadius);
+  for (let i = 0; i < R * 2; i++) {
+    const r = R * Math.sqrt(Math.random());
+    const theta = 2 * Math.PI * Math.random();
+    const distX = r * Math.cos(theta);
+    const distY = r * Math.sin(theta);
+    const norm = Math.sqrt(distX ** 2 + distY ** 2);
+    const speed = firework.lowestSpeed + Math.random() * (firework.highestSpeed - firework.lowestSpeed);
+    const speedX = distX / norm * speed;
+    const speedY = distY / norm * speed;
+    moving.push({
+      x,
+      y,
+      alpha: 1,
+      alphaDecrease: firework.lowestAlphaDecrease + Math.random() * (firework.highestAlphaDecrease - firework.lowestAlphaDecrease),
+      length: firework.lowestLength + Math.random() * (firework.highestLength - firework.lowestLength),
+      speedX,
+      speedY,
+      speedDecreaseX: speedX ** 2 / (2 * distX),
+      speedDecreaseY: speedY ** 2 / (2 * distY)
+    });
   }
   fireworks.push({
-    x,
-    y,
     color,
-    alpha1: 1,
-    alpha2: -1,
-    alphaDecrease1: firework.lowestAlphaDecrease1 + Math.random() * (firework.highestAlphaDecrease1 - firework.lowestAlphaDecrease1),
-    alphaDecrease2: firework.lowestAlphaDecrease2 + Math.random() * (firework.highestAlphaDecrease2 - firework.lowestAlphaDecrease2),
-    degrees,
-    length: 0,
-    speed: firework.lowestSpeed + Math.random() * (firework.highestSpeed - firework.lowestSpeed),
-    speedDecrease: firework.lowestSpeedDecrease + Math.random() * (firework.highestSpeedDecrease - firework.lowestSpeedDecrease),
-    steps
+    moving,
+    fading: []
   });
 }
 
 function createRocket (x, y) {
-  x -= canvas.width / 2;
-  y -= canvas.height;
-  const norm = Math.sqrt(x ** 2 + y ** 2);
+  const distX = x - canvas.width / 2;
+  const distY = y - canvas.height;
+  const norm = Math.sqrt(distX ** 2 + distY ** 2);
   const speed = rocket.lowestSpeed + Math.random() * (rocket.highestSpeed - rocket.lowestSpeed);
-  const speedX = x / norm * speed;
-  const speedY = y / norm * speed;
+  const speedX = distX / norm * speed;
+  const speedY = distY / norm * speed;
   let color;
   if (rocket.color === rocket.colors.length) {
     color = rocket.colors[Math.floor(Math.random() * (rocket.colors.length - 2))];
@@ -259,8 +251,8 @@ function createRocket (x, y) {
     length: rocket.lowestLength + Math.random() * (rocket.highestLength - rocket.lowestLength),
     speedX,
     speedY,
-    speedDecreaseX: speedX ** 2 / (2 * x),
-    speedDecreaseY: speedY ** 2 / (2 * y)
+    speedDecreaseX: speedX ** 2 / (2 * distX),
+    speedDecreaseY: speedY ** 2 / (2 * distY)
   });
 }
 
