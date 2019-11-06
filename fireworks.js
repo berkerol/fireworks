@@ -1,25 +1,4 @@
-/* global performance FPSMeter */
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-const getTime = typeof performance === 'function' ? performance.now : Date.now;
-const FRAME_THRESHOLD = 300;
-const FRAME_DURATION = 1000 / 58;
-let then = getTime();
-let acc = 0;
-let animation;
-FPSMeter.theme.colorful.container.height = '40px';
-const meter = new FPSMeter({
-  left: canvas.width - 130 + 'px',
-  top: 'auto',
-  bottom: '12px',
-  theme: 'colorful',
-  heat: 1,
-  graph: 1
-});
-
+/* global canvas ctx animation addPause addResize loop paintLine generateRandomNumber colorIndex:writable colorCodes addCustomColor generateRandomColor */
 let random = true;
 
 const firework = {
@@ -37,8 +16,7 @@ const firework = {
 };
 
 const rocket = {
-  color: 16,
-  colors: [[255, 30, 40], [255, 150, 20], [255, 220, 0], [0, 255, 100], [100, 255, 20], [50, 200, 200], [120, 220, 255], [80, 180, 255], [220, 120, 255], [255, 100, 150], [240, 20, 200], [140, 140, 140], [170, 170, 170], [200, 200, 200], [255, 0, 0], [0, 0, 0]],
+  colorDefault: [0, 0, 0],
   lineCap: 'round',
   lineWidth: 4,
   shadowBlur: 20,
@@ -54,68 +32,38 @@ const rocket = {
 const fireworks = [];
 const rockets = [];
 
-draw();
-const dropdown = document.getElementById('change-color');
-const custom = document.getElementById('custom');
-const colors = ['Red', 'Orange', 'Yellow', 'Lime', 'Green', 'Teal', 'Aqua', 'Blue', 'Purple', 'Pink', 'Fuchsia', 'Dark Gray', 'Light Gray', 'Silver'];
-for (const i in colors) {
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'dropdown-item';
-  button.setAttribute('data-value', i);
-  button.innerHTML = colors[i];
-  dropdown.insertBefore(button, custom);
-  if (i === '2' || i === '5' || i === '7' || i === '10' || i === '13') {
-    const div = document.createElement('div');
-    div.className = 'dropdown-divider';
-    dropdown.insertBefore(div, custom);
-  }
-}
 document.querySelectorAll('.dropdown-item').forEach(e => {
   e.addEventListener('click', function () {
     document.getElementById('change-color-text').innerText = this.innerText;
-    rocket.color = +this.dataset.value;
-    if (rocket.color === rocket.colors.length - 1) {
-      rocket.colors[rocket.colors.length - 1] = rocket.colors[Math.floor(Math.random() * (rocket.colors.length - 2))];
+    colorIndex = +this.dataset.value;
+    if (colorIndex === colorCodes.length) {
+      rocket.colorDefault = generateRandomColor();
     }
   });
 });
-document.getElementById('customColor').addEventListener('change', function () {
-  rocket.colors[rocket.colors.length - 2] = this.value.match(/[A-Za-z0-9]{2}/g).map(v => parseInt(v, 16));
-});
-document.addEventListener('keyup', keyUpHandler);
+addCustomColor();
+addPause();
+addResize();
 document.addEventListener('mousedown', mouseDownHandler);
-window.addEventListener('resize', resizeHandler);
 
-function draw () {
-  const now = getTime();
-  let ms = now - then;
-  let frames = 0;
-  then = now;
-  if (ms < FRAME_THRESHOLD) {
-    acc += ms;
-    while (acc >= FRAME_DURATION) {
-      frames++;
-      acc -= FRAME_DURATION;
-    }
-  }
-  meter.tick();
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+loop(function (frames) {
   ctx.lineCap = rocket.lineCap;
   ctx.lineWidth = firework.lineWidth;
   for (const f of fireworks) {
+    const color = `rgba(${f.color[0]}, ${f.color[1]}, ${f.color[2]}, `;
     for (const m of f.moving) {
-      drawFirework(m, f.color);
+      paintLine(m.x, m.y, m.x + m.speedX / firework.speed * m.length, m.y + m.speedY / firework.speed * m.length, `${color}${m.alpha})`);
     }
-    for (const s of f.fading) {
-      drawFirework(s, f.color);
+    for (const m of f.fading) {
+      paintLine(m.x, m.y, m.x + m.speedX / firework.speed * m.length, m.y + m.speedY / firework.speed * m.length, `${color}${m.alpha})`);
     }
   }
   ctx.lineWidth = rocket.lineWidth;
   ctx.save();
   ctx.shadowBlur = rocket.shadowBlur;
   for (const r of rockets) {
-    drawRocket(r);
+    ctx.shadowColor = r.color;
+    paintLine(r.x, r.y, r.x + r.speedX / rocket.speed * r.length, r.y + r.speedY / rocket.speed * r.length, r.color);
   }
   ctx.restore();
   if (random && Math.random() < rocket.probability) {
@@ -123,26 +71,7 @@ function draw () {
   }
   removeFireworks(frames);
   removeRockets(frames);
-  animation = window.requestAnimationFrame(draw);
-}
-
-function drawFirework (f, c) {
-  const color = `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${f.alpha})`;
-  ctx.strokeStyle = color;
-  ctx.beginPath();
-  ctx.moveTo(f.x, f.y);
-  ctx.lineTo(f.x + f.speedX / firework.speed * f.length, f.y + f.speedY / firework.speed * f.length);
-  ctx.stroke();
-}
-
-function drawRocket (r) {
-  ctx.shadowColor = r.color;
-  ctx.strokeStyle = r.color;
-  ctx.beginPath();
-  ctx.moveTo(r.x, r.y);
-  ctx.lineTo(r.x + r.speedX / rocket.speed * r.length, r.y + r.speedY / rocket.speed * r.length);
-  ctx.stroke();
-}
+});
 
 function removeFireworks (frames) {
   for (let i = fireworks.length - 1; i >= 0; i--) {
@@ -199,22 +128,22 @@ function removeRockets (frames) {
 
 function createFirework (x, y, color) {
   const moving = [];
-  const R = firework.lowestRadius + Math.random() * (firework.highestRadius - firework.lowestRadius);
+  const R = generateRandomNumber(firework.lowestRadius, firework.highestRadius);
   for (let i = 0; i < R * 2; i++) {
     const r = R * Math.sqrt(Math.random());
     const theta = 2 * Math.PI * Math.random();
     const distX = r * Math.cos(theta);
     const distY = r * Math.sin(theta);
     const norm = Math.sqrt(distX ** 2 + distY ** 2);
-    const speed = firework.lowestSpeed + Math.random() * (firework.highestSpeed - firework.lowestSpeed);
+    const speed = generateRandomNumber(firework.lowestSpeed, firework.highestSpeed);
     const speedX = distX / norm * speed;
     const speedY = distY / norm * speed;
     moving.push({
       x,
       y,
       alpha: 1,
-      alphaDecrease: firework.lowestAlphaDecrease + Math.random() * (firework.highestAlphaDecrease - firework.lowestAlphaDecrease),
-      length: firework.lowestLength + Math.random() * (firework.highestLength - firework.lowestLength),
+      alphaDecrease: generateRandomNumber(firework.lowestAlphaDecrease, firework.highestAlphaDecrease),
+      length: generateRandomNumber(firework.lowestLength, firework.highestLength),
       speedX,
       speedY,
       speedDecreaseX: speedX ** 2 / (2 * distX),
@@ -232,21 +161,23 @@ function createRocket (x, y) {
   const distX = x - canvas.width / 2;
   const distY = y - canvas.height;
   const norm = Math.sqrt(distX ** 2 + distY ** 2);
-  const speed = rocket.lowestSpeed + Math.random() * (rocket.highestSpeed - rocket.lowestSpeed);
+  const speed = generateRandomNumber(rocket.lowestSpeed, rocket.highestSpeed);
   const speedX = distX / norm * speed;
   const speedY = distY / norm * speed;
   let color;
-  if (rocket.color === rocket.colors.length) {
-    color = rocket.colors[Math.floor(Math.random() * (rocket.colors.length - 2))];
+  if (colorIndex === colorCodes.length + 1) {
+    color = generateRandomColor();
+  } else if (colorIndex === colorCodes.length) {
+    color = rocket.colorDefault;
   } else {
-    color = rocket.colors[rocket.color];
+    color = colorCodes[colorIndex];
   }
   rockets.push({
     x: canvas.width / 2,
     y: canvas.height,
     color: `rgb(${color[0]}, ${color[1]}, ${color[2]})`,
     colorFirework: color,
-    length: rocket.lowestLength + Math.random() * (rocket.highestLength - rocket.lowestLength),
+    length: generateRandomNumber(rocket.lowestLength, rocket.highestLength),
     speedX,
     speedY,
     speedDecreaseX: speedX ** 2 / (2 * distX),
@@ -263,24 +194,8 @@ window.changeRandom = function () {
   }
 };
 
-function keyUpHandler (e) {
-  if (e.keyCode === 80) {
-    if (animation === undefined) {
-      animation = window.requestAnimationFrame(draw);
-    } else {
-      window.cancelAnimationFrame(animation);
-      animation = undefined;
-    }
-  }
-}
-
 function mouseDownHandler (e) {
   if (animation !== undefined) {
     createRocket(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
   }
-}
-
-function resizeHandler () {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
 }
