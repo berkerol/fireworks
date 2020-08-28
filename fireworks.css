@@ -3,7 +3,7 @@
 }
 
 canvas {
-  background: #222;
+  background: linear-gradient(#202020, #303030 80%, #404040);
   display: block;
 }
 

@@ -1,4 +1,4 @@
-/* global canvas ctx animation addPause addResize loop paintLine generateRandomNumber colorIndex:writable colorCodes addCustomColor generateRandomColor */
+/* global canvas ctx animation addPause loop paintLine generateRandomNumber colorIndex:writable colorCodes addCustomColor generateRandomColor resizeHandler backgroundCanvas */
 let random = true;
 
 const firework = {
@@ -32,6 +32,7 @@ const rocket = {
 const fireworks = [];
 const rockets = [];
 
+resizeHandler();
 document.querySelectorAll('.dropdown-item').forEach(e => {
   e.addEventListener('click', function () {
     document.getElementById('change-color-text').innerText = this.innerText;
@@ -43,10 +44,11 @@ document.querySelectorAll('.dropdown-item').forEach(e => {
 });
 addCustomColor();
 addPause();
-addResize();
 document.addEventListener('mousedown', mouseDownHandler);
+window.addEventListener('resize', resizeHandler);
 
 loop(function (frames) {
+  ctx.drawImage(backgroundCanvas, 0, 0);
   ctx.lineCap = rocket.lineCap;
   ctx.lineWidth = firework.lineWidth;
   for (const f of fireworks) {
