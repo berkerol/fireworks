@@ -36,7 +36,7 @@ resizeHandler();
 document.querySelectorAll('.dropdown-item').forEach(e => {
   e.addEventListener('click', function () {
     document.getElementById('change-color-text').innerText = this.innerText;
-    colorIndex = +this.dataset.value;
+    colorIndex = +this.dataset.bsValue;
     if (colorIndex === colorCodes.length) {
       rocket.colorDefault = generateRandomColor();
     }
